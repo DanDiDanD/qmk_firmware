@@ -161,7 +161,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|  PLAY |    | ENTER |------+------+------+------+------+------|
  * | LCTR |   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |RShift|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *            | LGUI | LAlt | LCTR |Space | /LOWER  /       \RAISE \  |Space | RCTR | LAlt | RGUI |
+    *            | LGUI | LAlt | RCTR |Space | /LOWER  /       \RAISE \  |Space | RCTR | LAlt | RGUI |
  *            |      |      |      |      |/       /         \      \ |      |      |      |      |
  *            `----------------------------------'           '------''---------------------------'
  */
@@ -169,13 +169,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,------------------------------------------------.                    ,---------------------------------------------------.
   KC_ESC ,  KC_1,   KC_2,    KC_3,    KC_4,    KC_5,                       KC_6,    KC_7,   KC_8,    KC_9,    KC_0,    KC_ENT,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-  KC_TAB,  KC_Q,   KC_W,    KC_E_UP,    KC_R,    KC_T,                     KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSPC,
+  KC_SLSH,  KC_Q,   KC_W,    KC_E_UP, KC_R,    KC_T,                       KC_Y,    KC_U,   KC_I,    KC_O,    KC_P,    KC_BSPC,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
   KC_LSFT,  KC_A,  KC_S_LEFT, KC_D_DOWN, KC_F_RIGHT, KC_G,                 KC_H,    KC_J,   KC_K,    KC_L,    KC_SCLN, RALT_T(KC_QUOT),
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
   KC_LCTL,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  KC_TRNS,    KC_TRNS, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_LSFT,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-                 KC_TRNS, KC_TRNS, KC_TRNS, KC_SPC,  KC_TRNS ,    KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_CAPS
+                 KC_BSLS, KC_TRNS, KC_RCTL, KC_SPC,  KC_TRNS ,    KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_CAPS
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
 ),
 /*
@@ -189,7 +189,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|  MUTE |    |       |------+------+------+------+------+------|
  * | LCTR |   Z  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  | RSFT|
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *            | LGUI | LAlt | LCTR |Space | /LOWER  /       \RAISE \  |Space | RCTR | LAlt | RGUI |
+ *            |   \  | LAlt | LCTR |Space | /LOWER  /       \RAISE \  |Space | RCTR | LAlt | RGUI |
  *            |      |      |      |      |/       /         \      \ |      |      |      |      |
  *            `----------------------------------'           '------''---------------------------'
  */
@@ -203,7 +203,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
   KC_LCTL,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,  KC_TRNS,    KC_TRNS, KC_N,    KC_M,   KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-                 KC_TRNS, KC_TRNS, KC_TRNS, KC_SPC,  KC_TRNS ,    KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_CAPS
+                 KC_BSLS, KC_TRNS, KC_TRNS, KC_SPC,  KC_TRNS ,    KC_TRNS, KC_TRNS,  KC_TRNS, KC_TRNS, KC_CAPS
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
 ),
 
@@ -882,10 +882,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case KC_ARROW:
-            if (record->event.pressed) {
-                SEND_STRING("=>");
+            if (layer_state_is(_LOWER) && get_highest_layer(default_layer_state) == _GAMING) {
+                if (record->event.pressed) {
+                    register_code16(KC_TAB);
+                } else {
+                    unregister_code16(KC_TAB);
+                }
+                return false;
+            } else {
+                if (record->event.pressed) {
+                    SEND_STRING("=>");
+                }
+                return false;
             }
-            return false;
             break;
         case KC_CONST:
             if (record->event.pressed) {
